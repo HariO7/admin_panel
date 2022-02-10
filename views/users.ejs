@@ -1,0 +1,23 @@
+<h1>Users</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>NO:</th>
+            <th>name</th>
+            <th>project</th>
+            <th>Edit/Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% data.map((data,index)=> { %>
+        <tr>
+            <td><p><%= index+1 %></p></td>
+            <td><p><%= data.name%></p></td>
+            <td><p><%= data.projects%></p></td>
+            <td><form action="/user/<%= data._id %>" method="get"><button>Edit</button></form></td>
+            <td><form action="/user/<%= data._id %>" method="delete"><button>delete</button></form></td>
+        </tr>     
+        <% }) %>
+    </tbody>
+</table>
