@@ -4,7 +4,6 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const User = require('./models/user');
-const {isAuth , isLoggedin} = require('./middleware');
 const session = require('express-session')
 const methodOverride = require('method-override');
 const router = require('./routes/router');

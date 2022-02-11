@@ -6,14 +6,16 @@ module.exports = {
         if(req.session.name === "admin"){
             next()
         }else{
-            res.redirect('/');
+            res.send("You need ADMIN premission of accessing")
         }
     },
-    isLoggedin:(req,res,next) =>{
-        if(req.session.name === 'admin'){
-            res.redirect('/admin')
-        }else{
-            next();
+    isReg:
+        (req,res,next) => {
+            if(req.session.name){
+                next()
+            }else{
+                res.redirect('/register')
+            }
         }
-    }
+    
 }

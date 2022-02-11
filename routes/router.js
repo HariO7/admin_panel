@@ -1,46 +1,13 @@
 const router = require('express').Router();
 const User = require('../models/user')
+const {isAuth, isReg} = require('../middleware');
+const { route } = require('express/lib/application');
 
 
+//routes
 
 
-
-
-router.get('/login', (req,res) =>{
-    res.render('login');
-})
-
-
-router.post('/login', async(req,res)=>{
-    try {
-       const { name, password, role } = req.body;
-       if(!(name && password )){
-           res.status(404).send('all input should be filled')
-       }
-       const user = await User.findOne({ name });
-
-       if(user.password === password){
-           if(user.role === 'admin'){
-               res.redirect('/admin')
-           }else{
-            res.redirect('dash')
-           }
-
-            }else{
-           res.status(404).send("incorrect password");
-       }
-
-    } catch (error) {
-        console.log(error)
-    }
-})
-
-
-
-router.get('/admin', (req,res) =>{
-    res.render('admin')
-})
-
+//CREATE
 router.get('/register', (req,res) =>{
     res.render('register')
 })
@@ -56,11 +23,51 @@ router.post('/register', (req,res) =>{
         if(err){
             console.log(err);
         }else{
+            req.session.name = 'basic';
             res.redirect('/login')
         }
         
     })
 })
+
+
+//CREATE-LOGIN
+router.get('/login',isReg, (req,res) =>{
+    res.render('login');
+})
+
+
+router.post('/login', async(req,res)=>{
+    try {
+       const { name, password, role } = req.body;
+       if(!(name && password )){
+           res.status(404).send('all input should be filled')
+       }
+       const user = await User.findOne({ name });
+
+       if(user.password === password){
+           if(user.role === 'admin'){
+               req.session.name = 'admin'
+               res.redirect('/admin')
+           }else{
+            res.redirect('dash')
+           }
+
+            }else{
+           res.status(404).send("incorrect password");
+       }
+
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+
+//ACCESS-PAGES
+router.get('/admin',isAuth, (req,res) =>{
+    res.render('admin')
+})
+
 
 router.get('/dash', (req,res) =>{
     res.render('dash')
@@ -108,6 +115,11 @@ router.delete('/users/:id',(req,res)=>{
         }
         res.redirect('/users')
     })
+})
+
+router.get('/logout',(req,res)=>{
+    req.session.destroy();
+    res.send('Logged out successful <a href="/register">register</a>')
 })
 
 
