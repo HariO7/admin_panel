@@ -22,26 +22,28 @@ app.use(methodOverride('_method'))
 mongoose.connect(process.env.DATABASE_URL,()=>{
     console.log("connected to database");
 })
+
+
+
 //routes
 app.get('/login', (req,res) =>{
     res.render('login');
 })
 app.post('/login', async(req,res)=>{
     try {
-       const { name, password } = req.body;
+       const { name, password, role } = req.body;
        if(!(name && password )){
            res.status(404).send('all input should be filled')
        }
        const user = await User.findOne({ name });
-       
 
        if(user.password === password){
-           if(req.session.name === 'admin'){
+           if(user.role === 'admin'){
                res.redirect('/admin')
            }else{
-            res.redirect('/dash');
-            console.log(req.session.name);
-           }  
+            res.redirect('dash')
+           }
+
             }else{
            res.status(404).send("incorrect password");
        }
@@ -68,10 +70,6 @@ app.post('/register', (req,res) =>{
         password: req.body.password,
         role: req.body.role
     })
-    if(req.body.name === "admin"){
-        req.session.name = "admin";
-        console.log(req.session.name);
-    }
     user.save((err)=>{
         if(err){
             console.log(err);
@@ -83,13 +81,7 @@ app.post('/register', (req,res) =>{
 })
 
 app.get('/dash', (req,res) =>{
-    if(req.body.name === 'admin'){
-        req.session.name = 'admin';
-        res.redirect('/admin')
-    }else{
-        console.log(req.session);
-        res.render('dash')
-    }
+    res.render('dash')
 })
 
 app.get('/users',(req,res)=>{
@@ -107,9 +99,35 @@ app.get('/users',(req,res)=>{
 })
 
 app.get('/user/:id',(req,res)=>{
-    res.render("editUser");
+    const userData = req.params.id;
+    User.findById(userData,(err,data) =>{
+        res.render("editUser",{ data : data });
+    } )
+    
 })
 
+app.put('/users/:id',(req,res)=>{
+    const id = req.params.id;
+    const editUser ={
+        name: req.body.name,
+        projects: req.body.projects,
+        role: req.body.role
+    }
+    User.findByIdAndUpdate(id, editUser,(err,data)=>{
+        console.log(err)
+        res.redirect('/users')
+    })
+})
+
+app.delete('/users/:id',(req,res)=>{
+    const id = req.params.id
+    User.findByIdAndDelete(id,(err)=>{
+        if(err){
+            console.log(err);
+        }
+        res.redirect('/users')
+    })
+})
 
 app.listen(3000,()=>{
     console.log("server listening on port 3000");

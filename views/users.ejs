@@ -16,7 +16,8 @@
             <td><p><%= data.name%></p></td>
             <td><p><%= data.projects%></p></td>
             <td><form action="/user/<%= data._id %>" method="get"><button>Edit</button></form></td>
-            <td><form action="/user/<%= data._id %>" method="delete"><button>delete</button></form></td>
+
+            <td><form action="/users/<%= data._id %>?_method=DELETE" method="post"><button>delete</button></form></td>
         </tr>     
         <% }) %>
     </tbody>
